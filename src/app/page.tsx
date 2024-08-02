@@ -4,7 +4,7 @@ import styles from './page.module.css';
 export default function Home() {
 	return (
 		<main className={styles.main}>
-			<h1>-- Construction Underway --</h1>
+			<h1>✨ Construction Underway ✨</h1>
 			<p>For now, you can catch me here:</p>
 			<ul className={styles.list}>
 				<li>
