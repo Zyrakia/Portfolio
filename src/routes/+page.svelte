@@ -8,13 +8,17 @@
 </script>
 
 <svelte:head>
-	<title>Ole (Zyrakia) \\ Hello World</title>
-
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
 		href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,100..900;1,100..900&display=swap"
 		rel="stylesheet"
+	/>
+
+	<title>Ole (Zyrakia) \\ Hello World</title>
+	<meta
+		name="description"
+		content="I'm Ole, a german-born aspiring software developer, interested in everything computers."
 	/>
 </svelte:head>
 
@@ -22,10 +26,18 @@
 	<h1>✨ Construction Underway ✨</h1>
 	<p>For now, you can catch me here:</p>
 	<ul>
-		<li><a href="https://github.com/zyrakia"><GithubIcon font-size={24} color="inherit" /> </a></li>
-		<li><a href="https://twitter.com/zyrakia"><XIcon font-size={24} color="inherit" /> </a></li>
 		<li>
-			<a href="https://discord.com/users/243522319664807937"
+			<a href="https://github.com/zyrakia" aria-label="GitHub"
+				><GithubIcon font-size={24} color="inherit" />
+			</a>
+		</li>
+		<li>
+			<a href="https://twitter.com/zyrakia" aria-label="Twitter (X)"
+				><XIcon font-size={24} color="inherit" />
+			</a>
+		</li>
+		<li>
+			<a href="https://discord.com/users/243522319664807937" aria-label="Discord"
 				><DiscordIcon font-size={24} color="inherit" /></a
 			>
 		</li>
@@ -71,7 +83,8 @@
 		transition: color 150ms ease;
 	}
 
-	a:hover, a:active {
+	a:hover,
+	a:active {
 		color: gold;
 	}
 </style>
