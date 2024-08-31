@@ -1,10 +1,19 @@
 <script lang="ts">
+	import type client_InteractiveBackground from '$lib/components/interactive-background.svelte';
 	import '../reset.css';
 	import '../global.css';
 
-	import GithubIcon from '~icons/bi/github';
-	import XIcon from '~icons/bi/twitter-x';
-	import DiscordIcon from '~icons/bi/discord';
+	import BxErrorAlt from '~icons/bx/error-alt';
+	import MdiGithub from '~icons/mdi/github';
+	import PrimeTwitter from '~icons/prime/twitter';
+	import IcRoundDiscord from '~icons/ic/round-discord';
+
+	import { onMount } from 'svelte';
+
+	let InteractiveBackground: typeof client_InteractiveBackground;
+	onMount(async () => {
+		InteractiveBackground = (await import('$lib/components/interactive-background.svelte')).default;
+	});
 </script>
 
 <svelte:head>
@@ -22,32 +31,47 @@
 	/>
 </svelte:head>
 
-<main>
-	<h1>✨ Construction Underway ✨</h1>
-	<p>For now, you can catch me here:</p>
+<noscript>
+	<div class="no-script-icon">
+		<BxErrorAlt font-size="xx-large" color="red" />
+		<h1>JavaScript is required.</h1>
+	</div>
+	<p class="no-script-text">
+		This website makes use of JavaScript for core functionality. If JavaScript is unavailable, you can
+		still reach me at these places:
+	</p>
+	<hr class="no-script-divider" />
 	<ul>
 		<li>
-			<a href="https://github.com/zyrakia" aria-label="GitHub"
-				><GithubIcon font-size={24} color="inherit" />
-			</a>
+			<a href="https://github.com/zyrakia"><MdiGithub font-size={24} /> </a>
 		</li>
 		<li>
-			<a href="https://twitter.com/zyrakia" aria-label="Twitter (X)"
-				><XIcon font-size={24} color="inherit" />
-			</a>
+			<a href="https://x.com/zyrakia"><PrimeTwitter font-size={24} /> </a>
 		</li>
 		<li>
-			<a href="https://discord.com/users/243522319664807937" aria-label="Discord"
-				><DiscordIcon font-size={24} color="inherit" /></a
-			>
+			<a href="https://discord.com/users/243522319664807937"><IcRoundDiscord font-size={24} /> </a>
 		</li>
 	</ul>
+</noscript>
+
+<main>
+	<h1>Hi</h1>
 </main>
 
+<svelte:component this={InteractiveBackground} />
+
 <style>
-	main {
+	main,
+	noscript {
+		width: 100%;
 		height: 100%;
-		padding: 5rem;
+		padding: 1.5rem;
+	}
+
+	noscript {
+		position: absolute;
+		left: 0;
+		top: 0;
 
 		display: flex;
 		align-items: center;
@@ -56,6 +80,31 @@
 		gap: 1rem;
 
 		text-align: center;
+		background-color: #121212;
+	}
+
+	.no-script-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	@media (max-width: 800px) {
+		.no-script-icon {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+	}
+
+	.no-script-text {
+		max-width: 800px;
+	}
+
+	.no-script-divider {
+		width: 100%;
+		max-width: 800px;
+		opacity: 0.5;
 	}
 
 	ul {
@@ -80,11 +129,12 @@
 	a {
 		text-decoration: none;
 		color: white;
-		transition: color 150ms ease;
+		transition: all 150ms ease;
 	}
 
 	a:hover,
 	a:active {
 		color: gold;
+		scale: 1.15;
 	}
 </style>
