@@ -6,8 +6,15 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { setIntervalRandom } from '$lib/util/set-interval-random';
 
-	const minRows = Math.floor(window.innerHeight / 64);
-	const minCols = Math.floor(window.innerWidth / 64);
+	let height = window.innerHeight;
+	let width = window.innerWidth;
+	const resize = () => {
+		height = window.innerHeight;
+		width = window.innerWidth;
+	};
+
+	$: minRows = 10
+	$: minCols = 10
 	const tickInterval = 2000;
 	const tickRandom = 500;
 
@@ -22,6 +29,8 @@
 	const tickCols = () => ($cols > 0 ? cols.set(0) : cols.set(rand(minCols, minCols)));
 
 	onMount(() => {
+		window.addEventListener('resize', resize);
+
 		tickRows();
 		tickCols();
 		clearRowsInterval = setIntervalRandom(tickRows, tickInterval, tickInterval + tickRandom);
@@ -29,6 +38,8 @@
 	});
 
 	onDestroy(() => {
+		window.removeEventListener('resize', resize);
+
 		clearRowsInterval?.();
 		clearRowsInterval = undefined;
 		rows.set(0);
@@ -43,22 +54,22 @@
 	<Stage
 		config={{
 			listening: false,
-			width: window.innerWidth,
-			height: window.innerHeight,
+			width: width,
+			height: height,
 		}}
 	>
 		<Layer>
 			<LineGrid
 				rows={Math.floor($rows)}
 				cols={Math.floor($cols)}
-				width={window.innerWidth}
-				height={window.innerHeight}
+				{width}
+				{height}
 				config={{ stroke: 'rgba(0, 100, 0, 0.1)', strokeWidth: 1 }}
 			/>
 		</Layer>
 
 		<Layer>
-			<Vignette width={window.innerWidth} height={window.innerHeight} color="darkgreen" blur={1.8} />
+			<Vignette {width} {height} color="darkgreen" blur={1.8} />
 		</Layer>
 	</Stage>
 </div>
