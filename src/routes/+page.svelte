@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type client_InteractiveBackground from '$lib/components/interactive-background.svelte';
+	import type client_InteractiveBackground from '$lib/components/animated-background/animated-background.svelte';
 	import '../reset.css';
 	import '../global.css';
 
@@ -12,7 +12,9 @@
 
 	let InteractiveBackground: typeof client_InteractiveBackground;
 	onMount(async () => {
-		InteractiveBackground = (await import('$lib/components/interactive-background.svelte')).default;
+		InteractiveBackground = (
+			await import('$lib/components/animated-background/animated-background.svelte')
+		).default;
 	});
 </script>
 
@@ -54,11 +56,10 @@
 	</ul>
 </noscript>
 
+<svelte:component this={InteractiveBackground} />
 <main>
 	<h1>Hi</h1>
 </main>
-
-<svelte:component this={InteractiveBackground} />
 
 <style>
 	main,
