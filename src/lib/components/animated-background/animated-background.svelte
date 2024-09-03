@@ -5,6 +5,7 @@
 	import { tweened } from 'svelte/motion';
 	import { onDestroy, onMount } from 'svelte';
 	import { setIntervalRandom } from '$lib/util/set-interval-random';
+	import { randInt } from '$lib/util/rand';
 
 	let height = window.innerHeight;
 	let width = window.innerWidth;
@@ -13,8 +14,8 @@
 		width = window.innerWidth;
 	};
 
-	$: minRows = 10
-	$: minCols = 10
+	let minRows = 10;
+	let minCols = 10;
 	const tickInterval = 2000;
 	const tickRandom = 1000;
 
@@ -24,9 +25,8 @@
 	let clearRowsInterval: Function | undefined;
 	let clearColsInterval: Function | undefined;
 
-	const rand = (min: number, max: number) => Math.random() * (max - min) + min;
-	const tickRows = () => ($rows > 0 ? rows.set(0) : rows.set(rand(minRows, minRows)));
-	const tickCols = () => ($cols > 0 ? cols.set(0) : cols.set(rand(minCols, minCols)));
+	const tickRows = () => ($rows > 0 ? rows.set(0) : rows.set(randInt(minRows, minRows) + 10));
+	const tickCols = () => ($cols > 0 ? cols.set(0) : cols.set(randInt(minCols, minCols + 10)));
 
 	onMount(() => {
 		window.addEventListener('resize', resize);
@@ -64,12 +64,12 @@
 				cols={Math.floor($cols)}
 				{width}
 				{height}
-				config={{ stroke: 'rgba(0, 100, 0, 0.1)', strokeWidth: 1 }}
+				config={{ stroke: 'rgba(0, 100, 0, 0.2)', strokeWidth: 3 }}
 			/>
 		</Layer>
 
 		<Layer>
-			<Vignette {width} {height} color="darkgreen" blur={1.8} />
+			<Vignette {width} {height} color="darkgreen" blur={1.25} />
 		</Layer>
 	</Stage>
 </div>
