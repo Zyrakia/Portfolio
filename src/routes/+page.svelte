@@ -3,12 +3,14 @@
 	import '../reset.css';
 	import '../global.css';
 
+	import { onMount } from 'svelte';
+
 	import BxErrorAlt from '~icons/bx/error-alt';
 	import MdiGithub from '~icons/mdi/github';
 	import PrimeTwitter from '~icons/prime/twitter';
 	import IcRoundDiscord from '~icons/ic/round-discord';
-
-	import { onMount } from 'svelte';
+	import TermSection from '$lib/components/term-section.svelte';
+	import TermText from '$lib/components/term-text.svelte';
 
 	let InteractiveBackground: typeof client_InteractiveBackground;
 	onMount(async () => {
@@ -58,7 +60,14 @@
 
 <svelte:component this={InteractiveBackground} />
 <main>
-	<h1>Hi</h1>
+	<TermSection title="Runtime Overview">
+		<TermText text="Administrator: Ole (Zyrakia)" />
+		<TermText text="Operating region: British Columbia, Canada" />
+		<!-- <TermSectionDivider /> -->
+		<div style="display: flex;">
+			<TermText text="Status: obtaining CST diploma from BCIT" />
+		</div>
+	</TermSection>
 </main>
 
 <style>

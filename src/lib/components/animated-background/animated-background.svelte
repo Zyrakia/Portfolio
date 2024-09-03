@@ -16,7 +16,7 @@
 	$: minRows = 10
 	$: minCols = 10
 	const tickInterval = 2000;
-	const tickRandom = 500;
+	const tickRandom = 1000;
 
 	let rows = tweened(0, { duration: tickInterval / 2 });
 	let cols = tweened(0, { duration: tickInterval / 2 });
