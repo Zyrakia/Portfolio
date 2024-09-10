@@ -12,7 +12,7 @@
 		let targetRenderedChars = 1;
 		for (let i = 0; i < text.length; i++) {
 			targetRenderedChars++;
-			if (text[i] !== renderedText[i]) break; 
+			if (text[i] !== renderedText[i]) break;
 		}
 
 		return text.slice(0, Math.min(text.length, targetRenderedChars));
@@ -40,8 +40,10 @@
 	onDestroy(stopRender);
 </script>
 
-{#if renderAsHtml}
-	{@html renderedText}
-{:else}
-	{renderedText}
-{/if}
+<p>
+	{#if renderAsHtml}
+		{@html renderedText}
+	{:else}
+		{renderedText}
+	{/if}
+</p>
