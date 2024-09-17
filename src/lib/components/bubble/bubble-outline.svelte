@@ -17,6 +17,10 @@
 	$: if (active) strokeGrowth.set(1 * (level * 0.4));
 	else strokeGrowth.set(0, { soft: true });
 
+	let opacity = spring(0);
+	$: if (active) opacity.set(1);
+	else opacity.set(0);
+
 	let rotation = 0;
 	let konvaAnim: Konva.Animation | undefined;
 	$: if (active) konvaAnim?.start();
@@ -41,6 +45,7 @@
 		stroke: color,
 		strokeWidth: strokeWidth,
 		dash: level === 0 ? undefined : [50, 25],
+        opacity: level === 0 ? 1 : $opacity,
 		listening: false,
 		perfectDrawEnabled: false,
 	}}
