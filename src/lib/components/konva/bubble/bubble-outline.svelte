@@ -9,7 +9,7 @@
 	export let radius;
 	export let active = false;
 	export let level = 0;
-	export let color = 'rgba(0, 255, 0, 0.4)';
+	export let color = 'rgba(100, 255, 100, 0.4)';
 
 	let strokeWidth = 1;
 

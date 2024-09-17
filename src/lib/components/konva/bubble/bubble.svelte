@@ -16,15 +16,14 @@
 	export let logoUrl: string;
 	export let title: string;
 	export let description: string | string[] = [];
-	export let link: string = "";
+	export let link: string = '';
 
-
-	let hover = false;
+	let active = false;
 
 	$: if (link && groupRef) {
 		const container = groupRef.getLayer()?.getStage().container();
 		if (container) {
-			if (hover) container.style.cursor = 'pointer';
+			if (active) container.style.cursor = 'pointer';
 			else container.style.cursor = 'default';
 		}
 	}
@@ -32,13 +31,13 @@
 
 <Group config={{ x, y }} bind:handle={groupRef}>
 	{#each { length: outlines + 1 } as _, i}
-		<BubbleOutline {radius} bind:active={hover} level={i} />
+		<BubbleOutline {radius} bind:active level={i} />
 	{/each}
 
 	<Circle
 		config={{ radius }}
-		on:mouseenter={() => (hover = true)}
-		on:mouseleave={() => (hover = false)}
+		on:mouseenter={() => (active = true)}
+		on:mouseleave={() => (active = false)}
 		on:click={() => link && location.assign(link)}
 	/>
 
@@ -54,5 +53,5 @@
 		}}
 	/>
 
-	<BubbleLabel {title} active={hover} {description} offset={{ x: 0, y: -radius }} />
+	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
 </Group>
