@@ -9,19 +9,19 @@
 
 	let groupRef: Konva.Group | undefined = undefined;
 
+	export let x;
+	export let y;
 	export let radius = 50;
 	export let outlines = 2;
 	export let logoUrl: string;
 	export let title: string;
 	export let description: string | string[] = [];
-	export let link: string;
+	export let link: string = "";
 
-	let x = window.innerWidth / 2;
-	let y = window.innerHeight / 2;
 
 	let hover = false;
 
-	$: if (groupRef) {
+	$: if (link && groupRef) {
 		const container = groupRef.getLayer()?.getStage().container();
 		if (container) {
 			if (hover) container.style.cursor = 'pointer';
@@ -39,7 +39,7 @@
 		config={{ radius }}
 		on:mouseenter={() => (hover = true)}
 		on:mouseleave={() => (hover = false)}
-		on:click={() => location.assign(link)}
+		on:click={() => link && location.assign(link)}
 	/>
 
 	<Image
