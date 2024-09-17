@@ -9,12 +9,12 @@
 
 	let groupRef: Konva.Group | undefined = undefined;
 
-	export let x;
-	export let y;
+	export let x: number;
+	export let y: number;
 	export let radius = 50;
 	export let outlines = 2;
-	export let logoUrl: string;
 	export let title: string;
+	export let logoUrl: string;
 	export let description: string | string[] = [];
 	export let link: string = '';
 
