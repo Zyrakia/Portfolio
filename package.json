@@ -9,6 +9,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@tanstack/svelte-query": "^5.56.2",
 		"konva": "^9.3.14",
 		"svelte-konva": "^0.3.1"
 	},
