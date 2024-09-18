@@ -30,6 +30,6 @@
 
 <Rect config={{ ...bg, width, height }} />
 
-<Group bind:handle={ref}>
+<Group bind:handle={ref} config={{ offsetX: -padding / 2, offsetY: -padding / 2 }}>
 	<slot />
 </Group>

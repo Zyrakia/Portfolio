@@ -50,30 +50,28 @@
 			listening: false,
 		}}
 	>
-		<Group config={{ offsetX: -labelPadding / 2, y: labelPadding / 2 }}>
+		<Text
+			config={{
+				text: title,
+				fill: 'white',
+				fontSize: fontSize,
+				listening: false,
+				perfectDrawEnabled: false,
+				textDecoration: descriptionLines.length > 0 ? 'underline' : 'none',
+			}}
+		/>
+
+		{#each descriptionLines as descriptionLine, i}
 			<Text
 				config={{
-					text: title,
+					text: descriptionLine,
 					fill: 'white',
-					fontSize: fontSize,
+					fontSize: fontSize * 0.75,
+					y: (i + 1) * fontSize + lineHeight,
 					listening: false,
 					perfectDrawEnabled: false,
-					textDecoration: descriptionLines.length > 0 ? 'underline' : 'none',
 				}}
 			/>
-
-			{#each descriptionLines as descriptionLine, i}
-				<Text
-					config={{
-						text: descriptionLine,
-						fill: 'white',
-						fontSize: fontSize * 0.75,
-						y: (i + 1) * fontSize + lineHeight,
-						listening: false,
-						perfectDrawEnabled: false,
-					}}
-				/>
-			{/each}
-		</Group>
+		{/each}
 	</AutoSizedBackground>
 </Group>
