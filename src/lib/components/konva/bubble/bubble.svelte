@@ -49,17 +49,25 @@
 		on:click={() => link && location.assign(link)}
 	/>
 
-	<Image
+	<Group
 		config={{
-			image: createImage(logoUrl, 'todo'),
-			width: radius * 2 - radius * 0.5,
-			height: radius * 2 - radius * 0.5,
-			offsetX: radius - (radius * 0.5) / 2,
-			offsetY: radius - (radius * 0.5) / 2,
-			listening: false,
-			perfectDrawEnabled: false,
+			clipFunc: (ctx) => {
+				ctx.arc(0, 0, radius * 0.9, 0, Math.PI * 2 , false);
+			},
 		}}
-	/>
-	
+	>
+		<Image
+			config={{
+				image: createImage(logoUrl, 'todo'),
+				width: radius * 2 - radius * 0.5,
+				height: radius * 2 - radius * 0.5,
+				offsetX: radius - (radius * 0.5) / 2,
+				offsetY: radius - (radius * 0.5) / 2,
+				listening: false,
+				perfectDrawEnabled: false,
+			}}
+		/>
+	</Group>
+
 	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
 </Group>
