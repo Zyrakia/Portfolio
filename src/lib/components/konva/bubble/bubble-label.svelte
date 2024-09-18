@@ -6,14 +6,14 @@
 	import { wrapString } from '$lib/util/wrap-string';
 
 	export let title: string;
-	export let description: string | string[] = [];
+	export let description: string = '';
 	export let active = false;
 	export let offset: Vector2d = { x: 0, y: 0 };
 	export let fontSize = 20;
 	export let lineHeight = 6;
 	export let lineWidth = 40;
 
-	$: descriptionLines = Array.isArray(description) ? description : wrapString(description, lineWidth);
+	$: descriptionLines = wrapString(description, lineWidth);
 
 	const labelOpacity = spring(0);
 	const labelOffsetX = spring(0);

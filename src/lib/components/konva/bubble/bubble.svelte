@@ -6,8 +6,10 @@
 
 	import BubbleOutline from './bubble-outline.svelte';
 	import BubbleLabel from './bubble-label.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	let groupRef: Konva.Group | undefined = undefined;
+	const emit = createEventDispatcher();
 
 	export let x: number;
 	export let y: number;
@@ -15,10 +17,11 @@
 	export let outlines = 2;
 	export let title: string;
 	export let logoUrl: string;
-	export let description: string | string[] = [];
+	export let description: string | undefined;
 	export let link: string = '';
 
 	let active = false;
+	$: emit('active', active);
 
 	$: if (link && groupRef) {
 		const container = groupRef.getLayer()?.getStage().container();
@@ -30,6 +33,8 @@
 </script>
 
 <Group config={{ x, y }} bind:handle={groupRef}>
+	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
+
 	{#each { length: outlines + 1 } as _, i}
 		<BubbleOutline {radius} bind:active level={i} />
 	{/each}
@@ -52,6 +57,4 @@
 			perfectDrawEnabled: false,
 		}}
 	/>
-
-	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
 </Group>

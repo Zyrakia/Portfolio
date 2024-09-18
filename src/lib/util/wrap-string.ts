@@ -11,7 +11,8 @@ export function wrapString(str: string, maxWidth: number, breakWord = false) {
 	const lines: string[] = [];
 
 	let currentLine = '';
-	const push = () => {
+	const push = (stripLast = false) => {
+		if (stripLast) currentLine = currentLine.slice(0, -1);
 		lines.push(currentLine);
 		currentLine = '';
 	};
@@ -19,6 +20,12 @@ export function wrapString(str: string, maxWidth: number, breakWord = false) {
 	for (let i = 0; i < chars.length; i++) {
 		const char = chars[i];
 		currentLine += char;
+
+		if (char === '\n') {
+			push(true);
+			continue;
+		}
+
 		if (currentLine.length <= maxWidth) continue;
 
 		if (breakWord) {
@@ -27,10 +34,10 @@ export function wrapString(str: string, maxWidth: number, breakWord = false) {
 		}
 
 		if (/\s/.test(char)) {
-			currentLine = currentLine.slice(0, -1);
-			push();
+			push(true);
 		}
 	}
 
+	push();
 	return lines;
 }
