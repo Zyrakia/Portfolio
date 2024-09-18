@@ -7,6 +7,7 @@
 	import BubbleOutline from './bubble-outline.svelte';
 	import BubbleLabel from './bubble-label.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { spring } from 'svelte/motion';
 
 	let groupRef: Konva.Group | undefined = undefined;
 	const emit = createEventDispatcher();
@@ -19,6 +20,10 @@
 	export let logoUrl: string;
 	export let description: string | undefined;
 	export let link: string = '';
+	export let opacity = 1;
+
+	let animatedOpacity = spring(opacity);
+	$: animatedOpacity.set(opacity);
 
 	let active = false;
 	$: emit('active', active);
@@ -32,9 +37,7 @@
 	}
 </script>
 
-<Group config={{ x, y }} bind:handle={groupRef}>
-	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
-
+<Group config={{ x, y, opacity: $animatedOpacity }} bind:handle={groupRef}>
 	{#each { length: outlines + 1 } as _, i}
 		<BubbleOutline {radius} bind:active level={i} />
 	{/each}
@@ -57,4 +60,6 @@
 			perfectDrawEnabled: false,
 		}}
 	/>
+	
+	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
 </Group>
