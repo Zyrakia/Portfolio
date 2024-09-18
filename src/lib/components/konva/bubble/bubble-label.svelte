@@ -42,7 +42,7 @@
 		}}
 		padding={labelPadding}
 		bg={{
-			fill: 'rgba(0, 0, 0, 0.9)',
+			fill: 'rgba(0, 0, 0, 1)',
 			stroke: 'white',
 			strokeWidth: 2,
 			cornerRadius: 8,
