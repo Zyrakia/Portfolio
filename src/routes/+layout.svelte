@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type client_InteractiveBackground from '$lib/components/animated-background/animated-background.svelte';
+	import type client_InteractiveBackground from '$lib/components/konva/animated-background/animated-background.svelte';
 	import '../reset.css';
 	import '../global.css';
 
@@ -11,7 +11,7 @@
 	let InteractiveBackground: typeof client_InteractiveBackground;
 	onMount(async () => {
 		InteractiveBackground = (
-			await import('$lib/components/animated-background/animated-background.svelte')
+			await import('$lib/components/konva/animated-background/animated-background.svelte')
 		).default;
 	});
 
@@ -19,6 +19,7 @@
 		defaultOptions: {
 			queries: {
 				enabled: browser,
+				retry: false,
 			},
 		},
 	});
