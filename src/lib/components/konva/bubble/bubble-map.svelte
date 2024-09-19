@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type Konva from 'konva';
-	import type { ComponentProps } from 'svelte';
+	import { onMount, tick, type ComponentProps } from 'svelte';
 	import { Stage, Layer, Line } from 'svelte-konva';
 	import BubbleGroup from './bubble-group.svelte';
 	import Bubble from './bubble.svelte';
@@ -14,7 +14,7 @@
 	const isGroup = (v: (typeof items)[number]): v is Omit<ComponentProps<BubbleGroup>, 'x' | 'y'> =>
 		!v.hasOwnProperty('title');
 
-	let stage: Konva.Stage;
+	let stageRef: Konva.Stage | undefined;
 
 	export let x = 0;
 	export let y = 0;
@@ -76,6 +76,8 @@
 	let bubbleNavigationTarget: number | undefined = undefined;
 
 	const autoSelectBubble = (index: number | undefined) => {
+		if (!stageRef) return;
+
 		if (index === undefined || index < 0 || index >= items.length) {
 			activeBubbleTitle.set(undefined);
 			return;
@@ -86,26 +88,32 @@
 		else activeBubbleTitle.set(undefined);
 
 		const targetPos = itemPositions[index];
-		if (targetPos) stage.to({ x: -targetPos.x, y: -targetPos.y, duration: 0.25 });
+		if (targetPos) stageRef.to({ x: -targetPos.x, y: -targetPos.y, duration: 0.25 });
 	};
 
 	const handleWheel = (e: WheelEvent) => {
-		if (stage.isDragging()) return;
+		if (!stageRef) return;
+
+		if (stageRef.isDragging()) return;
 		bubbleNavigationTarget ??= -1;
 
 		if (e.deltaY < 0) bubbleNavigationTarget--;
 		else if (e.deltaY > 0) bubbleNavigationTarget++;
-		else bubbleNavigationTarget = undefined;
 
 		if (bubbleNavigationTarget !== undefined)
 			bubbleNavigationTarget = Math.max(0, Math.min(bubbleNavigationTarget, items.length - 1));
 	};
 
 	$: autoSelectBubble(bubbleNavigationTarget);
+
+	onMount(async () => {
+		await tick();
+		bubbleNavigationTarget = 0;
+	});
 </script>
 
 <Stage
-	bind:handle={stage}
+	bind:handle={stageRef}
 	config={{
 		width: width,
 		height: height,
@@ -115,7 +123,7 @@
 		y: y,
 		draggable: true,
 	}}
-	on:dragmove={() => stage.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stage.x())))}
+	on:dragmove={() => stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())))}
 	on:wheel={(e) => handleWheel(e.detail.evt)}
 >
 	<Layer config={{ listening: false }}>
