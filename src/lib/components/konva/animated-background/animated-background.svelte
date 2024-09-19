@@ -29,8 +29,6 @@
 	const tickCols = () => ($cols > 0 ? cols.set(0) : cols.set(randInt(minCols, minCols + 10)));
 
 	onMount(() => {
-		window.addEventListener('resize', resize);
-
 		tickRows();
 		tickCols();
 		clearRowsInterval = setIntervalRandom(tickRows, tickInterval, tickInterval + tickRandom);
@@ -38,8 +36,6 @@
 	});
 
 	onDestroy(() => {
-		window.removeEventListener('resize', resize);
-
 		clearRowsInterval?.();
 		clearRowsInterval = undefined;
 		rows.set(0);
@@ -49,6 +45,8 @@
 		cols.set(0);
 	});
 </script>
+
+<svelte:window on:resize={resize} />
 
 <div class="konva-wrapper">
 	<Stage
