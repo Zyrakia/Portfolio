@@ -11,7 +11,7 @@
 	export let level = 0;
 	export let color = 'rgba(100, 255, 100, 0.4)';
 
-	let strokeWidth = 1;
+	let strokeWidth = 2;
 
 	let strokeGrowth = spring(0);
 	$: if (active) strokeGrowth.set(1 * (level * 0.4));
@@ -24,7 +24,11 @@
 	let rotation = 0;
 	let konvaAnim: Konva.Animation | undefined;
 	$: if (active) konvaAnim?.start();
-	else konvaAnim?.stop();
+	else {
+		setTimeout(() => {
+			konvaAnim?.stop();
+		}, 250);
+	}
 
 	onMount(async () => {
 		await tick();
@@ -44,9 +48,12 @@
 		rotation: level % 2 === 0 ? rotation : -rotation,
 		stroke: color,
 		strokeWidth: strokeWidth,
-		dash: level === 0 ? undefined : [50, 25],
+		dash: level === 0 ? [Math.PI * radius / 4] : [50, 25],
         opacity: level === 0 ? 1 : $opacity,
 		listening: false,
 		perfectDrawEnabled: false,
+		shadowEnabled: true,
+		shadowColor: 'darkgreen',
+		shadowBlur: 10,
 	}}
 />

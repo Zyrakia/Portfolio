@@ -8,8 +8,10 @@
 	import BubbleLabel from './bubble-label.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { spring } from 'svelte/motion';
+	import type { SceneContext } from 'konva/lib/Context';
 
 	let groupRef: Konva.Group | undefined = undefined;
+	let logoRef: Konva.Image | undefined = undefined;
 	const emit = createEventDispatcher();
 
 	export let x: number;
@@ -35,6 +37,9 @@
 			else container.style.cursor = 'default';
 		}
 	}
+
+	$: imageSize = radius * 1.25;
+	$: imageClipFunction = (ctx: SceneContext) => ctx.arc(0, 0, imageSize * 0.7, 0, Math.PI * 2, false);
 </script>
 
 <Group config={{ x, y, opacity: $animatedOpacity }} bind:handle={groupRef}>
@@ -49,22 +54,20 @@
 		on:click={() => link && location.assign(link)}
 	/>
 
-	<Group
-		config={{
-			clipFunc: (ctx) => {
-				ctx.arc(0, 0, radius * 0.9, 0, Math.PI * 2 , false);
-			},
-		}}
-	>
+	<Group config={{ clipFunc: imageClipFunction }}>
 		<Image
+			bind:handle={logoRef}
 			config={{
-				image: createImage(logoUrl, 'todo'),
-				width: radius * 2 - radius * 0.5,
-				height: radius * 2 - radius * 0.5,
-				offsetX: radius - (radius * 0.5) / 2,
-				offsetY: radius - (radius * 0.5) / 2,
+				image: createImage(logoUrl, title),
+				width: imageSize,
+				height: imageSize,
+				offsetX: imageSize / 2,
+				offsetY: imageSize / 2,
 				listening: false,
 				perfectDrawEnabled: false,
+				shadowEnabled: true,
+				shadowColor: 'darkgreen',
+				shadowBlur: 10,
 			}}
 		/>
 	</Group>
