@@ -68,9 +68,9 @@
 	});
 
 	$: technology = z.object({ name: z.string().optional() }).passthrough().safeParse($technologyQuery.data);
-	$: projectBubbles = $technologyQuery.isFetched
-		? projects.map((v) => createProjectBubble(v, technology.data?.name))
-		: [];
+	$: projectBubbles = $technologyQuery.isFetching
+		? []
+		: projects.map((v) => createProjectBubble(v, technology.data?.name));
 
 	const resize = () => {
 		width = window.innerWidth;
@@ -81,12 +81,10 @@
 		resize();
 
 		const params = new URLSearchParams(location.search);
-		if (!params.has('using')) return;
-
-		const id = parseInt(params.get('using')!);
-		if (isNaN(id)) return;
-
-		technologyId = id;
+		if (params.has('using')) {
+			const id = parseInt(params.get('using')!);
+			if (!isNaN(id)) technologyId = id;
+		}
 
 		fetchProjects();
 	});
