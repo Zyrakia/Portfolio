@@ -22,7 +22,9 @@
 	export let width;
 	$: maxExtraDragX = width;
 
-	const getNeededDiameter = (radius: number) => radius * 4;
+	const offsetStagePanCoords = (x: number, y: number) => ({ x: x + width / 2, y: y + height / 2 });
+
+	const getNeededDiameter = (radius: number) => radius * 6;
 
 	const getDist = (v1: { x: number; y: number }, v2: { x: number; y: number }) =>
 		Math.sqrt(Math.pow(Math.abs(v1.x - v2.x), 2) + Math.pow(Math.abs(v1.y - v2.y), 2));
@@ -88,7 +90,7 @@
 		else activeBubbleTitle.set(undefined);
 
 		const targetPos = itemPositions[index];
-		if (targetPos) stageRef.to({ x: -targetPos.x, y: -targetPos.y, duration: 0.25 });
+		if (targetPos) stageRef.to({ ...offsetStagePanCoords(-targetPos.x, -targetPos.y), duration: 0.25 });
 	};
 
 	const handleWheel = (e: WheelEvent) => {
@@ -117,11 +119,9 @@
 	config={{
 		width: width,
 		height: height,
-		offsetX: -width / 2,
-		offsetY: -height / 2,
+		draggable: true,
 		x: x,
 		y: y,
-		draggable: true,
 	}}
 	on:dragmove={() => stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())))}
 	on:wheel={(e) => handleWheel(e.detail.evt)}
