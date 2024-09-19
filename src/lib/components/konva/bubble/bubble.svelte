@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type Konva from 'konva';
 
-	import { createImage } from '$lib/util/create-image';
 	import { Group, Circle, Image } from 'svelte-konva';
 
 	import BubbleOutline from './bubble-outline.svelte';
@@ -47,6 +46,15 @@
 		if (toggle) $activeBubbleTitle = title;
 		else if (active) $activeBubbleTitle = undefined;
 	};
+
+	const createImage = (url: string) => {
+		return new Promise<HTMLImageElement>((res, rej) => {
+			const img = document.createElement('img');
+			img.src = url;
+			img.onload = () => res(img);
+			img.onerror = () => rej(new Error('Failed to load image'));
+		});
+	};
 </script>
 
 <svelte:window on:click={() => handleToggle(false)} />
@@ -68,23 +76,25 @@
 	/>
 
 	{#if logoUrl}
-		<Group config={{ clipFunc: imageClipFunction }}>
-			<Image
-				bind:handle={logoRef}
-				config={{
-					image: createImage(logoUrl, title),
-					width: imageSize,
-					height: imageSize,
-					offsetX: imageSize / 2,
-					offsetY: imageSize / 2,
-					listening: false,
-					perfectDrawEnabled: false,
-					shadowEnabled: true,
-					shadowColor: 'darkgreen',
-					shadowBlur: 10,
-				}}
-			/>
-		</Group>
+		{#await createImage(logoUrl) then imgElement}
+			<Group config={{ clipFunc: imageClipFunction }}>
+				<Image
+					bind:handle={logoRef}
+					config={{
+						image: imgElement,
+						width: imageSize,
+						height: imageSize,
+						offsetX: imageSize / 2,
+						offsetY: imageSize / 2,
+						listening: false,
+						perfectDrawEnabled: false,
+						shadowEnabled: true,
+						shadowColor: 'darkgreen',
+						shadowBlur: 10,
+					}}
+				/>
+			</Group>
+		{/await}
 	{/if}
 
 	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
