@@ -26,6 +26,7 @@
 	$: if (active) konvaAnim?.start();
 	else {
 		setTimeout(() => {
+			if (active) return;
 			konvaAnim?.stop();
 		}, 250);
 	}
