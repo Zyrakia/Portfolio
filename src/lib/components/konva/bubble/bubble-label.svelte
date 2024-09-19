@@ -6,14 +6,14 @@
 	import { wrapString } from '$lib/util/wrap-string';
 
 	export let title: string;
-	export let description: string = '';
+	export let description: string | undefined = undefined;
 	export let active = false;
 	export let offset: Vector2d = { x: 0, y: 0 };
 	export let fontSize = 20;
 	export let lineHeight = 6;
 	export let lineWidth = 40;
 
-	$: descriptionLines = wrapString(description, lineWidth);
+	$: descriptionLines = description === undefined ? [] : wrapString(description, lineWidth);
 
 	const labelOpacity = spring(0);
 	const labelOffsetX = spring(0);
@@ -61,17 +61,19 @@
 			}}
 		/>
 
-		{#each descriptionLines as descriptionLine, i}
-			<Text
-				config={{
-					text: descriptionLine,
-					fill: 'white',
-					fontSize: fontSize * 0.75,
-					y: (i + 1) * fontSize + lineHeight,
-					listening: false,
-					perfectDrawEnabled: false,
-				}}
-			/>
-		{/each}
+		{#if descriptionLines.length > 0}
+			{#each descriptionLines as descriptionLine, i}
+				<Text
+					config={{
+						text: descriptionLine,
+						fill: 'white',
+						fontSize: fontSize * 0.75,
+						y: (i + 1) * fontSize + lineHeight,
+						listening: false,
+						perfectDrawEnabled: false,
+					}}
+				/>
+			{/each}
+		{/if}
 	</AutoSizedBackground>
 </Group>
