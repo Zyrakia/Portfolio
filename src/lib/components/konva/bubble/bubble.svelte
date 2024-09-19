@@ -20,8 +20,8 @@
 	export let radius: number;
 	export let outlines = 2;
 	export let title: string;
-	export let logoUrl: string;
-	export let description: string | undefined;
+	export let logoUrl: string | undefined = undefined;
+	export let description: string | undefined = undefined;
 	export let link: string = '';
 	export let opacity = 1;
 
@@ -67,23 +67,25 @@
 		}}
 	/>
 
-	<Group config={{ clipFunc: imageClipFunction }}>
-		<Image
-			bind:handle={logoRef}
-			config={{
-				image: createImage(logoUrl, title),
-				width: imageSize,
-				height: imageSize,
-				offsetX: imageSize / 2,
-				offsetY: imageSize / 2,
-				listening: false,
-				perfectDrawEnabled: false,
-				shadowEnabled: true,
-				shadowColor: 'darkgreen',
-				shadowBlur: 10,
-			}}
-		/>
-	</Group>
+	{#if logoUrl}
+		<Group config={{ clipFunc: imageClipFunction }}>
+			<Image
+				bind:handle={logoRef}
+				config={{
+					image: createImage(logoUrl, title),
+					width: imageSize,
+					height: imageSize,
+					offsetX: imageSize / 2,
+					offsetY: imageSize / 2,
+					listening: false,
+					perfectDrawEnabled: false,
+					shadowEnabled: true,
+					shadowColor: 'darkgreen',
+					shadowBlur: 10,
+				}}
+			/>
+		</Group>
+	{/if}
 
 	<BubbleLabel {title} {active} {description} offset={{ x: 0, y: -radius }} />
 </Group>
