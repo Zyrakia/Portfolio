@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { API } from '$lib/api';
 	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
@@ -6,7 +7,9 @@
 	import { onMount, type ComponentProps } from 'svelte';
 	import { z } from 'zod';
 
-	const dateFormatter = new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium' });
+	const dateFormatter = new Intl.DateTimeFormat(browser ? navigator.language :'en-US', {
+		dateStyle: 'medium',
+	});
 
 	const getProjectTimeline = (rawStartDate: string | undefined, rawEndDate: string | undefined) => {
 		if (!rawStartDate) {
