@@ -52,7 +52,7 @@
 			const img = document.createElement('img');
 			img.src = url;
 			img.onload = () => res(img);
-			img.onerror = () => rej(new Error('Failed to load image'));
+			img.onerror = () => rej(new Error(`Failed to load image "${url}" for ${title}.`));
 		});
 	};
 </script>

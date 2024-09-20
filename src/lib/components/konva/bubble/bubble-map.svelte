@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type Konva from 'konva';
+	import Konva from 'konva';
 	import { onMount, tick, type ComponentProps } from 'svelte';
 	import { Stage, Layer, Line } from 'svelte-konva';
 	import BubbleGroup from './bubble-group.svelte';
@@ -16,8 +16,6 @@
 
 	let stageRef: Konva.Stage | undefined;
 
-	export let x = 0;
-	export let y = 0;
 	export let height;
 	export let width;
 	$: maxExtraDragX = width;
@@ -77,7 +75,7 @@
 
 	let bubbleNavigationTarget: number | undefined = undefined;
 
-	const autoSelectBubble = (index: number | undefined) => {
+	const gotoBubble = (index: number | undefined) => {
 		if (!stageRef) return;
 
 		if (index === undefined || index < 0 || index >= items.length) {
@@ -93,10 +91,34 @@
 		if (targetPos) stageRef.to({ ...offsetStagePanCoords(-targetPos.x, -targetPos.y), duration: 0.25 });
 	};
 
-	const handleWheel = (e: WheelEvent) => {
+	const autoGotoBubble = () => {
 		if (!stageRef) return;
 
+		const stageCenter = {
+			x: -stageRef.x() + stageRef.width() / 2,
+			y: -stageRef.y() + stageRef.height() / 2,
+		};
+
+		let closestIndex = bubbleNavigationTarget ?? 0;
+		let minDistance = Infinity;
+		for (let i = 0; i < items.length; i++) {
+			const pos = itemPositions[i];
+			const dist = getDist(stageCenter, pos);
+			if (dist > minDistance) continue;
+
+			minDistance = dist;
+			closestIndex = i;
+		}
+
+		bubbleNavigationTarget = undefined;
+		bubbleNavigationTarget = closestIndex;
+	};
+
+	const handleWheel = (e: WheelEvent) => {
+		if (!stageRef) return;
 		if (stageRef.isDragging()) return;
+
+		if ($activeBubbleTitle === undefined) return autoGotoBubble();
 		bubbleNavigationTarget ??= -1;
 
 		if (e.deltaY < 0) bubbleNavigationTarget--;
@@ -106,7 +128,7 @@
 			bubbleNavigationTarget = Math.max(0, Math.min(bubbleNavigationTarget, items.length - 1));
 	};
 
-	$: autoSelectBubble(bubbleNavigationTarget);
+	$: gotoBubble(bubbleNavigationTarget);
 
 	onMount(async () => {
 		await tick();
@@ -120,8 +142,6 @@
 		width: width,
 		height: height,
 		draggable: true,
-		x: x,
-		y: y,
 	}}
 	on:dragmove={() => stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())))}
 	on:wheel={(e) => handleWheel(e.detail.evt)}
@@ -135,6 +155,7 @@
 						stroke: 'rgba(0, 100, 0, 0.3)',
 						strokeWidth: 2,
 						dash: [10, 10],
+						listening: false,
 					}}
 				/>
 			{/if}

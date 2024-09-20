@@ -10,8 +10,6 @@
 		value: any,
 		projectName?: string,
 	): Omit<ComponentProps<Bubble>, 'x' | 'y'> => {
-		console.log(value);
-
 		const desc = [];
 		if (projectName) desc.push(`Used in ${projectName}`);
 		if (typeof value.skill_level === 'number') desc.push(`⭐`.repeat(value.skill_level).padEnd(5, '❌'));
