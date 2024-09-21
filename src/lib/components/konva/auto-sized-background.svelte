@@ -28,6 +28,8 @@
 	});
 </script>
 
+<svelte:window on:resize={update} />
+
 <Rect config={{ ...bg, width, height }} />
 
 <Group bind:handle={ref} config={{ offsetX: -padding / 2, offsetY: -padding / 2 }}>
