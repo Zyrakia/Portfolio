@@ -11,7 +11,7 @@
 	});
 
 	type BubbleProps = Omit<ComponentProps<Bubble>, 'x' | 'y' | 'radius'>;
-	type BubbleGroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y'>;
+	type BubbleGroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y' | 'radius'>;
 	type Technology = Routes['/tech']['get']['__response'][number];
 
 	export let data;
@@ -39,7 +39,6 @@
 
 		return {
 			groupName: category,
-			radius: $suggestedBubbleRadius / 2,
 			bubbles,
 		} satisfies BubbleGroupProps;
 	};
@@ -57,4 +56,9 @@
 </script>
 
 <svelte:window on:resize={resize} />
-<svelte:component this={BubbleMap} {width} {height} items={techCategories} />
+<svelte:component
+	this={BubbleMap}
+	{width}
+	{height}
+	items={techCategories.map((v) => ({ ...v, radius: $suggestedBubbleRadius }))}
+/>

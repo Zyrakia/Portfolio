@@ -37,7 +37,7 @@
 		return `( ${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)} )`;
 	};
 
-	const createProjectBubble = (value: Project): Omit<ComponentProps<Bubble>, 'x' | 'y'> => {
+	const createProjectBubble = (value: Project): Omit<ComponentProps<Bubble>, 'x' | 'y' | 'radius'> => {
 		const lines = [];
 
 		if (value.description) lines.push(value.description + '\n');
@@ -49,7 +49,6 @@
 		lines.push(formattedTimeline);
 
 		return {
-			radius: $suggestedBubbleRadius,
 			title: value.name,
 			logoUrl: value.logo_url ?? undefined,
 			description: lines.join('\n'),
@@ -69,4 +68,9 @@
 </script>
 
 <svelte:window on:resize={resize} />
-<svelte:component this={BubbleMap} {width} {height} items={data.projects.map(createProjectBubble)} />
+<svelte:component
+	this={BubbleMap}
+	{width}
+	{height}
+	items={data.projects.map((v) => ({ ...createProjectBubble(v), radius: $suggestedBubbleRadius }))}
+/>
