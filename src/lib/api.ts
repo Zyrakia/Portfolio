@@ -26,6 +26,9 @@ const client = ky.create({
 	retry: 5,
 });
 
+/**
+ * Makes a request to the Zyapi.
+ */
 export async function api<
 	Route extends keyof Routes,
 	Method extends keyof Routes[Route],
@@ -41,11 +44,12 @@ export async function api<
 ) {
 	const { body, params = {}, query = {} } = init;
 
-	let formattedUrl: string = url.replace(/^\//g, '');
+	let formattedUrl = url.replace(/^\//g, '');
 	const requiredParams = url.matchAll(/\[(.+)\]/g);
-	for (const [param] of requiredParams) {
-		if (!(param in params)) throw `Param ${param} must be specified on this route!`;
-		formattedUrl = url.replaceAll(`[${param}]`, params[param]);
+	for (const [paramIdentifier] of requiredParams) {
+		const paramName = paramIdentifier.slice(1, -1);
+		if (!(paramName in params)) throw `Param "${paramName}" must be specified on this route!`;
+		formattedUrl = formattedUrl.replaceAll(paramIdentifier, params[paramName]);
 	}
 
 	const stringifiedQuery: Record<string, string> = {};
