@@ -1,77 +1,60 @@
 <script lang="ts">
-	import { api } from '$lib/api';
+	import type BubbleGroup from '$lib/components/konva/bubble/bubble-group.svelte';
 	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { suggestedBubbleRadius } from '$lib/stores/suggested-bubble-radius.js';
 	import { onMount, type ComponentProps } from 'svelte';
-	import { z } from 'zod';
-
-	const createTechnologyBubble = (
-		value: any,
-		projectName?: string,
-	): Omit<ComponentProps<Bubble>, 'x' | 'y'> => {
-		const desc = [];
-		if (projectName) desc.push(`Used in ${projectName}`);
-		if (typeof value.skill_level === 'number') desc.push(`⭐`.repeat(value.skill_level).padEnd(5, '❌'));
-
-		return {
-			radius: 50,
-			title: value.name,
-			logoUrl: value.logo_url,
-			description: desc.join('\n') || undefined,
-			link: value.url,
-		};
-	};
 
 	let BubbleMap: typeof client_BubbleMap;
 	onMount(() => {
 		import('$lib/components/konva/bubble/bubble-map.svelte').then((v) => (BubbleMap = v.default));
 	});
 
+	type BubbleProps = Omit<ComponentProps<Bubble>, 'x' | 'y' | 'radius'>;
+	type BubbleGroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y'>;
+	type Technology = Routes['/tech']['get']['__response'][number];
+
+	export let data;
+
 	let width = 0;
 	let height = 0;
 
-	let projectId: number | undefined = undefined;
+	const createBubble = (value: Technology) => {
+		const desc = [];
 
-	let technologies: any[] = [];
-	const fetchTechnologies = async () => {
-		const res = api('/tech', 'get', { query: { used_by_project: `${projectId ?? ''}` } });
+		const skillLevel = value.skill_level;
+		if (skillLevel) desc.push(`⭐`.repeat(skillLevel).padEnd(5, '❌'));
 
-		const { data } = z
-			.array(z.object({ name: z.string(), logo_url: z.string() }).passthrough())
-			.safeParse(res);
-		if (data) technologies = data;
+		return {
+			title: value.name,
+			logoUrl: value.logo_url ?? undefined,
+			description: desc.join('\n') || undefined,
+			link: value.url ?? undefined,
+		} satisfies BubbleProps;
 	};
 
-	$: projectQuery = createQuery({
-		queryKey: ['project', projectId],
-		queryFn: () =>
-			projectId !== undefined ? api('/projects/[id]', 'get', { params: { id: `${projectId}` } }) : null,
-	});
+	const createBubbleGroup = (category: string, values: Technology[]) => {
+		const bubbles: BubbleProps[] = [];
+		for (const value of values) bubbles.push(createBubble(value));
 
-	$: project = z.object({ name: z.string().optional() }).passthrough().safeParse($projectQuery.data);
-	$: techBubbles = $projectQuery.isFetching
-		? []
-		: technologies.map((v) => createTechnologyBubble(v, project.data?.name));
+		return {
+			groupName: category,
+			radius: $suggestedBubbleRadius / 2,
+			bubbles,
+		} satisfies BubbleGroupProps;
+	};
 
 	const resize = () => {
 		width = window.innerWidth;
 		height = window.innerHeight;
 	};
 
-	onMount(() => {
-		resize();
+	const techCategories: BubbleGroupProps[] = [];
+	for (const [category, technologies] of data.technologies.entries())
+		techCategories.push(createBubbleGroup(category, technologies));
 
-		const params = new URLSearchParams(location.search);
-		if (params.has('used_by')) {
-			const id = parseInt(params.get('used_by')!);
-			if (!isNaN(id)) projectId = id;
-		}
-
-		fetchTechnologies();
-	});
+	onMount(resize);
 </script>
 
 <svelte:window on:resize={resize} />
-
-<svelte:component this={BubbleMap} {width} {height} items={techBubbles} />
+<svelte:component this={BubbleMap} {width} {height} items={techCategories} />

@@ -36,7 +36,7 @@ export async function api<
 	init: {
 		body?: Handler extends HandlerType<unknown, infer Body> ? Body : never;
 		params?: Record<string, string>;
-		query?: Record<string, string>;
+		query?: Record<string, unknown>;
 	} = {},
 ) {
 	const { body, params = {}, query = {} } = init;
@@ -48,7 +48,17 @@ export async function api<
 		formattedUrl = url.replaceAll(`[${param}]`, params[param]);
 	}
 
-	const res = await client(formattedUrl, { json: body, searchParams: query, method: method as any }).json();
+	const stringifiedQuery: Record<string, string> = {};
+	for (const [key, value] of Object.entries(query)) {
+		if (value === undefined) continue;
+		stringifiedQuery[key] = `${value}`;
+	}
+
+	const res = await client(formattedUrl, {
+		json: body,
+		searchParams: stringifiedQuery,
+		method: method as any,
+	}).json();
 	const result = ResponseSchema.parse(res);
 
 	if (result.success) return result.value as Handler extends HandlerType<infer Payload> ? Payload : never;

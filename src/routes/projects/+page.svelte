@@ -1,17 +1,24 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { api } from '$lib/api';
-	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import { onMount, type ComponentProps } from 'svelte';
-	import { z } from 'zod';
+	import { suggestedBubbleRadius } from '$lib/stores/suggested-bubble-radius.js';
+
+	let BubbleMap: typeof client_BubbleMap;
+	onMount(() => {
+		import('$lib/components/konva/bubble/bubble-map.svelte').then((v) => (BubbleMap = v.default));
+	});
+
+	export let data;
+
+	type Project = Routes['/projects']['get']['__response'][number];
 
 	const dateFormatter = new Intl.DateTimeFormat(browser ? navigator.language : 'en-US', {
 		dateStyle: 'medium',
 	});
 
-	const getProjectTimeline = (rawStartDate: string | undefined, rawEndDate: string | undefined) => {
+	const getProjectTimeline = (rawStartDate?: string, rawEndDate?: string) => {
 		if (!rawStartDate) {
 			if (!rawEndDate) return '( In ongoing development )';
 			else {
@@ -30,64 +37,36 @@
 		return `( ${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)} )`;
 	};
 
-	const createProjectBubble = (
-		value: any,
-		technologyName?: string,
-	): Omit<ComponentProps<Bubble>, 'x' | 'y'> => {
+	const createProjectBubble = (value: Project): Omit<ComponentProps<Bubble>, 'x' | 'y'> => {
+		const lines = [];
+
+		if (value.description) lines.push(value.description + '\n');
+
+		const formattedTimeline = getProjectTimeline(
+			value.start_date ?? undefined,
+			value.end_date ?? undefined,
+		);
+		lines.push(formattedTimeline);
+
 		return {
-			radius: 50,
+			radius: $suggestedBubbleRadius,
 			title: value.name,
-			logoUrl: value.logo_url,
-			description: `${value.description}\n\n${technologyName ? `Using: ${technologyName}\n` : ''}${value.technologies_referenced !== undefined ? `\nReferenced technologies: ${value.technologies_referenced}\n` : ''}${getProjectTimeline(value.start_date, value.end_date)}`,
-			link: value.url,
+			logoUrl: value.logo_url ?? undefined,
+			description: lines.join('\n'),
+			link: value.url ?? undefined,
 		};
 	};
 
-	let BubbleMap: typeof client_BubbleMap;
-	onMount(() => {
-		import('$lib/components/konva/bubble/bubble-map.svelte').then((v) => (BubbleMap = v.default));
-	});
-
 	let width = 0;
 	let height = 0;
-
-	let technologyId: number | undefined = undefined;
-
-	let projects: any[] = [];
-	const fetchProjects = () =>
-		api('/projects', 'get', { query: { using_technology: `${technologyId ?? ''}` } });
-
-	$: technologyQuery = createQuery({
-		queryKey: ['technology', technologyId],
-		queryFn: () =>
-			technologyId === undefined
-				? null
-				: api('/tech/[id]', 'get', { params: { id: `${technologyId}` } }),
-	});
-
-	$: technology = z.object({ name: z.string().optional() }).passthrough().safeParse($technologyQuery.data);
-	$: projectBubbles = $technologyQuery.isFetching
-		? []
-		: projects.map((v) => createProjectBubble(v, technology.data?.name));
 
 	const resize = () => {
 		width = window.innerWidth;
 		height = window.innerHeight;
 	};
 
-	onMount(() => {
-		resize();
-
-		const params = new URLSearchParams(location.search);
-		if (params.has('using')) {
-			const id = parseInt(params.get('using')!);
-			if (!isNaN(id)) technologyId = id;
-		}
-
-		fetchProjects();
-	});
+	onMount(resize);
 </script>
 
 <svelte:window on:resize={resize} />
-
-<svelte:component this={BubbleMap} {width} {height} items={projectBubbles} />
+<svelte:component this={BubbleMap} {width} {height} items={data.projects.map(createProjectBubble)} />

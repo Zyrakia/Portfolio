@@ -4,8 +4,6 @@
 	import '../global.css';
 
 	import { onMount } from 'svelte';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-	import { browser } from '$app/environment';
 	import NoScript from '$lib/components/no-script.svelte';
 
 	let InteractiveBackground: typeof client_InteractiveBackground;
@@ -14,21 +12,10 @@
 			await import('$lib/components/konva/animated-background/animated-background.svelte')
 		).default;
 	});
-
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				enabled: browser,
-				retry: false,
-			},
-		},
-	});
 </script>
 
-<QueryClientProvider client={queryClient}>
-	<NoScript />
+<NoScript />
 
-	<svelte:component this={InteractiveBackground} />
+<svelte:component this={InteractiveBackground} />
 
-	<slot />
-</QueryClientProvider>
+<slot />
