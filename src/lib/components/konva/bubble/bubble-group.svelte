@@ -13,12 +13,15 @@
 	export let groupName: string = '';
 	export let bubbles: Omit<ComponentProps<Bubble>, 'x' | 'y' | 'radius'>[];
 
-	$: bubbleRadius = radius / (bubbles.length * 0.75);
+	let labelWidth = 0;
+	let labelHeight = 0;
+
 	export function getBubblePosition(index: number) {
 		const angle = (index * Math.PI * 2) / bubbles.length;
+
 		return {
-			x: Math.cos(angle) * (radius - bubbleRadius),
-			y: Math.sin(angle) * (radius - bubbleRadius),
+			x: Math.cos(angle) * radius * 4,
+			y: Math.sin(angle) * radius * 4,
 		};
 	}
 
@@ -27,14 +30,12 @@
 
 		return {
 			...v,
-			radius: bubbleRadius,
+			radius,
 			x: x,
 			y: y,
 		};
 	});
 
-	let labelWidth = 0;
-	let labelHeight = 0;
 	const updateLabelSize = (width: number, height: number) => {
 		labelWidth = width;
 		labelHeight = height;
@@ -57,7 +58,7 @@
 			on:update={({ detail: { width, height } }) => updateLabelSize(width, height)}
 		>
 			<Text
-				config={{ text: groupName, fontFamily: 'monospace', fill: 'white', fontSize: radius * 0.1 }}
+				config={{ text: groupName, fontFamily: 'monospace', fill: 'white', fontSize: radius * 0.5 }}
 			/>
 		</AutoSizedBackground>
 	</Group>
