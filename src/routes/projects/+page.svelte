@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { API } from '$lib/api';
+	import { api } from '$lib/api';
 	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { onMount, type ComponentProps } from 'svelte';
 	import { z } from 'zod';
 
-	const dateFormatter = new Intl.DateTimeFormat(browser ? navigator.language :'en-US', {
+	const dateFormatter = new Intl.DateTimeFormat(browser ? navigator.language : 'en-US', {
 		dateStyle: 'medium',
 	});
 
@@ -54,20 +54,15 @@
 	let technologyId: number | undefined = undefined;
 
 	let projects: any[] = [];
-	const fetchProjects = async () => {
-		let res;
-		if (technologyId === undefined) res = await API.getProjects();
-		else res = await API.getProjectsUsing(technologyId);
-
-		const { data } = z
-			.array(z.object({ name: z.string(), logo_url: z.string() }).passthrough())
-			.safeParse(res);
-		if (data) projects = data;
-	};
+	const fetchProjects = () =>
+		api('/projects', 'get', { query: { using_technology: `${technologyId ?? ''}` } });
 
 	$: technologyQuery = createQuery({
 		queryKey: ['technology', technologyId],
-		queryFn: () => (technologyId !== undefined ? API.getTechnology(technologyId) : null),
+		queryFn: () =>
+			technologyId === undefined
+				? null
+				: api('/tech/[id]', 'get', { params: { id: `${technologyId}` } }),
 	});
 
 	$: technology = z.object({ name: z.string().optional() }).passthrough().safeParse($technologyQuery.data);

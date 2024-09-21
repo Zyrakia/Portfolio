@@ -1,46 +1,56 @@
 import ky from 'ky';
-import type { Options } from 'ky';
 import { env } from '../env';
+import { z } from 'zod';
 
-interface Response<T> {
-	success: boolean;
-	error?: string;
-	value?: T;
-}
+const BaseResponseSchema = z.object({
+	success: z.boolean(),
+	statusCode: z.number(),
+	statusMessage: z.string(),
+});
 
-export namespace API {
-	const client = ky.create({
-		prefixUrl: env.VITE_API_URL,
-		retry: 5,
-	});
+const SuccessResponseSchema = BaseResponseSchema.extend({
+	success: z.literal(true),
+	message: z.string().optional(),
+	value: z.any().optional(),
+});
 
-	export async function getProjects() {
-		return request('projects');
+const ErrorResponseSchema = BaseResponseSchema.extend({
+	success: z.literal(false),
+	error: z.string(),
+});
+
+const ResponseSchema = SuccessResponseSchema.or(ErrorResponseSchema);
+
+const client = ky.create({
+	prefixUrl: env.VITE_API_URL,
+	retry: 5,
+});
+
+export async function api<
+	Route extends keyof Routes,
+	Method extends keyof Routes[Route],
+	Handler = Routes[Route][Method],
+>(
+	url: Route,
+	method: Method,
+	init: {
+		body?: Handler extends HandlerType<unknown, infer Body> ? Body : never;
+		params?: Record<string, string>;
+		query?: Record<string, string>;
+	} = {},
+) {
+	const { body, params = {}, query = {} } = init;
+
+	let formattedUrl: string = url.replace(/^\//g, '');
+	const requiredParams = url.matchAll(/\[(.+)\]/g);
+	for (const [param] of requiredParams) {
+		if (!(param in params)) throw `Param ${param} must be specified on this route!`;
+		formattedUrl = url.replaceAll(`[${param}]`, params[param]);
 	}
 
-	export function getProject(id: number, includeTechnologies: boolean) {
-		return request(`projects/${id}?${includeTechnologies ? 'technologies=true' : ''}`, { method: 'GET' });
-	}
+	const res = await client(formattedUrl, { json: body, searchParams: query, method: method as any }).json();
+	const result = ResponseSchema.parse(res);
 
-	export async function getProjectsUsing(techId: number) {
-		return request(`projects?using=${techId}`);
-	}
-
-	export async function getTechnologies() {
-		return request('tech');
-	}
-
-	export async function getTechnology(id: number) {
-		return request(`tech/${id}`);
-	}
-
-	export async function getTechnologiesUsedBy(projectId: number) {
-		return request(`tech?used_by=${projectId}`);
-	}
-
-	async function request<T>(url: string, options: Options = { method: 'get' }) {
-		const res = await client(url, options).json<Response<T>>();
-		if (res && res.success) return res.value;
-		else throw new Error(res?.error);
-	}
+	if (result.success) return result.value as Handler extends HandlerType<infer Payload> ? Payload : never;
+	else throw new Error('API Returned Error: ' + result.error);
 }

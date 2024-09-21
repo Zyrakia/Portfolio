@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { API } from '$lib/api';
+	import { api } from '$lib/api';
 	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
@@ -35,9 +35,7 @@
 
 	let technologies: any[] = [];
 	const fetchTechnologies = async () => {
-		let res;
-		if (projectId === undefined) res = await API.getTechnologies();
-		else res = await API.getTechnologiesUsedBy(projectId);
+		const res = api('/tech', 'get', { query: { used_by_project: `${projectId ?? ''}` } });
 
 		const { data } = z
 			.array(z.object({ name: z.string(), logo_url: z.string() }).passthrough())
@@ -47,7 +45,8 @@
 
 	$: projectQuery = createQuery({
 		queryKey: ['project', projectId],
-		queryFn: () => (projectId !== undefined ? API.getProject(projectId, false) : null),
+		queryFn: () =>
+			projectId !== undefined ? api('/projects/[id]', 'get', { params: { id: `${projectId}` } }) : null,
 	});
 
 	$: project = z.object({ name: z.string().optional() }).passthrough().safeParse($projectQuery.data);
