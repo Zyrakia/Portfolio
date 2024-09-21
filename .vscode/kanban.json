@@ -1,0 +1,59 @@
+{
+    "title": "Kanban",
+    "cols": [
+        {
+            "title": "Backlog",
+            "tasks": [
+                {
+                    "text": "Add 404 and 500 page",
+                    "id": "w5psadzm8q0mzjj02xzhz5hp"
+                },
+                {
+                    "text": "Add ability to navigate to the projects and technologies page through the home page",
+                    "id": "s5cyeh9cx3vy6tjguc5cemt1"
+                },
+                {
+                    "text": "Add jump to start or jump to end button on bubble maps",
+                    "id": "aj3s6osbhp5fvr6n08p7yt61"
+                },
+                {
+                    "text": "Add mobile navigation on bubble maps with arrows on the top and bottom that act as the scroll wheel",
+                    "id": "u2uoty9762qnqw251sm6be10"
+                },
+                {
+                    "text": "Add labels on bubble maps for context (shows the related project or related technology)",
+                    "id": "o5uc8ig0zbtc2019lyaf4lfj"
+                },
+                {
+                    "text": "Add popup when clicking on bubble, allows you to view the technologies used or visit the project",
+                    "id": "lz3k4822pq6vza0quluirg8k"
+                },
+                {
+                    "text": "Fix mobile scrolling on iOS (the bottom of the screen being pulled up)",
+                    "id": "o6j6xvl5ck0k0jzpwqccjvdo"
+                },
+                {
+                    "text": "Extract components further to decrease clutter.",
+                    "id": "n77qlj9t8rimplnntsvsm6hd"
+                }
+            ],
+            "id": "nhlswedy9q4uubxa3r5x6fqe",
+            "color": "#fcb900"
+        },
+        {
+            "title": "In Progress",
+            "tasks": [],
+            "id": "j0680lll63qgnerk64ckpuhh",
+            "color": "#0693e3"
+        },
+        {
+            "title": "Done",
+            "tasks": [],
+            "id": "usxzsqv8v0v2cdewcwp3dog3",
+            "color": "#00d084"
+        }
+    ],
+    "autosave": true,
+    "saveToFile": true,
+    "timestamp": 1726896789410
+}
