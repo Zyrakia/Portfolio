@@ -1,9 +1,17 @@
 {
-    "title": "Kanban",
+    "title": "Portfolio",
     "cols": [
         {
             "title": "Backlog",
             "tasks": [
+                {
+                    "text": "Add more detailed properties to the technology bubbles",
+                    "id": "jbnoav93lp8vwfr13mi9pdhj"
+                },
+                {
+                    "text": "Make bubbles auto resize when resizing window (override radius when rendering instead of when creating the properties)",
+                    "id": "qc4iijawukio2c6kk10xzcul"
+                },
                 {
                     "text": "Add 404 and 500 page",
                     "id": "w5psadzm8q0mzjj02xzhz5hp"
@@ -55,5 +63,5 @@
     ],
     "autosave": true,
     "saveToFile": true,
-    "timestamp": 1726896789410
+    "timestamp": 1726896946054
 }
