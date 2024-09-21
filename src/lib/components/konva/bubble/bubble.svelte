@@ -39,7 +39,10 @@
 	}
 
 	$: imageSize = radius * 1.25;
-	$: imageClipFunction = (ctx: SceneContext) => ctx.arc(0, 0, imageSize * 0.7, 0, Math.PI * 2, false);
+	$: imageClipFunction = (ctx: SceneContext) => {
+		if (imageSize <= 0) return;
+		ctx.arc(0, 0, imageSize * 0.7, 0, Math.PI * 2, false);
+	};
 
 	const redirect = () => link && window.location.assign(link);
 	const handleToggle = (toggle: boolean) => {
