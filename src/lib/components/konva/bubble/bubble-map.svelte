@@ -6,16 +6,16 @@
 	import Bubble from './bubble.svelte';
 	import { activeBubbleTitle } from '$lib/stores/active-bubble';
 
-	export let items: Omit<ComponentProps<Bubble | BubbleGroup>, 'x' | 'y'>[] = [];
+	type BubbleProps = Omit<ComponentProps<Bubble>, 'x' | 'y'>;
+	type GroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y'>;
+	type Item = BubbleProps | GroupProps;
 
-	const isBubble = (v: (typeof items)[number]): v is Omit<ComponentProps<Bubble>, 'x' | 'y'> =>
-		v.hasOwnProperty('title');
-
-	const isGroup = (v: (typeof items)[number]): v is Omit<ComponentProps<BubbleGroup>, 'x' | 'y'> =>
-		!v.hasOwnProperty('title');
+	const isBubble = (v: (typeof items)[number]): v is BubbleProps => v.hasOwnProperty('title');
+	const isGroup = (v: (typeof items)[number]): v is GroupProps => !v.hasOwnProperty('title');
 
 	let stageRef: Konva.Stage | undefined;
 
+	export let items: Item[] = [];
 	export let height;
 	export let width;
 	$: maxExtraDragX = width;
@@ -23,7 +23,6 @@
 	const offsetStagePanCoords = (x: number, y: number) => ({ x: x + width / 2, y: y + height / 2 });
 
 	const getNeededDiameter = (radius: number) => radius * 6;
-
 	const getDist = (v1: { x: number; y: number }, v2: { x: number; y: number }) =>
 		Math.sqrt(Math.pow(Math.abs(v1.x - v2.x), 2) + Math.pow(Math.abs(v1.y - v2.y), 2));
 
@@ -73,9 +72,9 @@
 
 	$: itemPositions = generatePositions(items, width);
 
-	let bubbleNavigationTarget: number | undefined = undefined;
-
-	const gotoBubble = (index: number | undefined) => {
+	let itemNavigationTarget: number | undefined = undefined;
+	let hasMovedSinceLastAutoTarget = false;
+	const gotoItem = (index: number | undefined) => {
 		if (!stageRef) return;
 
 		if (index === undefined || index < 0 || index >= items.length) {
@@ -88,10 +87,24 @@
 		else activeBubbleTitle.set(undefined);
 
 		const targetPos = itemPositions[index];
-		if (targetPos) stageRef.to({ ...offsetStagePanCoords(-targetPos.x, -targetPos.y), duration: 0.25 });
+
+		hasMovedSinceLastAutoTarget = false;
+		stageRef.to({
+			duration: 0.25,
+			...offsetStagePanCoords(-targetPos.x, -targetPos.y),
+		});
 	};
 
-	const autoGotoBubble = () => {
+	$: gotoItem(itemNavigationTarget);
+
+	const targetNextItem = (direction: 1 | -1) => {
+		let newTarget = (itemNavigationTarget ?? 0) + direction;
+		newTarget = Math.max(0, Math.min(newTarget, items.length - 1));
+		itemNavigationTarget = newTarget;
+	};
+
+	const autoGotoItem = (direction: 1 | -1) => {
+		if (!hasMovedSinceLastAutoTarget) return targetNextItem(direction);
 		if (!stageRef) return;
 
 		const stageCenter = {
@@ -99,7 +112,7 @@
 			y: -stageRef.y() + stageRef.height() / 2,
 		};
 
-		let closestIndex = bubbleNavigationTarget ?? 0;
+		let closestIndex = itemNavigationTarget ?? 0;
 		let minDistance = Infinity;
 		for (let i = 0; i < items.length; i++) {
 			const pos = itemPositions[i];
@@ -110,29 +123,21 @@
 			closestIndex = i;
 		}
 
-		bubbleNavigationTarget = undefined;
-		bubbleNavigationTarget = closestIndex;
+		itemNavigationTarget = undefined;
+		itemNavigationTarget = closestIndex;
 	};
 
 	const handleWheel = (e: WheelEvent) => {
 		if (!stageRef) return;
 		if (stageRef.isDragging()) return;
-
-		if ($activeBubbleTitle === undefined) return autoGotoBubble();
-		bubbleNavigationTarget ??= -1;
-
-		if (e.deltaY < 0) bubbleNavigationTarget--;
-		else if (e.deltaY > 0) bubbleNavigationTarget++;
-
-		if (bubbleNavigationTarget !== undefined)
-			bubbleNavigationTarget = Math.max(0, Math.min(bubbleNavigationTarget, items.length - 1));
+		autoGotoItem(e.deltaY < 0 ? -1 : 1);
 	};
 
-	$: gotoBubble(bubbleNavigationTarget);
+	$: itemNavigationTarget !== undefined && gotoItem(itemNavigationTarget);
 
 	onMount(async () => {
 		await tick();
-		bubbleNavigationTarget = 0;
+		itemNavigationTarget = 0;
 	});
 </script>
 
@@ -143,7 +148,10 @@
 		height: height,
 		draggable: true,
 	}}
-	on:dragmove={() => stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())))}
+	on:dragmove={() => {
+		hasMovedSinceLastAutoTarget = true;
+		stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())));
+	}}
 	on:wheel={(e) => handleWheel(e.detail.evt)}
 >
 	<Layer config={{ listening: false }}>
@@ -162,17 +170,11 @@
 		{/each}
 	</Layer>
 
-	{#each items as item, i}
-		{#if isGroup(item)}
-			<Layer>
-				<BubbleGroup {...item} x={itemPositions[i].x} y={itemPositions[i].y} />
-			</Layer>
-		{/if}
-	{/each}
-
 	<Layer>
 		{#each items as item, i}
-			{#if isBubble(item)}
+			{#if isGroup(item)}
+				<BubbleGroup {...item} x={itemPositions[i].x} y={itemPositions[i].y} />
+			{:else}
 				<Bubble {...item} x={itemPositions[i].x} y={itemPositions[i].y} />
 			{/if}
 		{/each}
