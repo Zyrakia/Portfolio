@@ -93,7 +93,6 @@
 		let res;
 		for (const technologies of data.technologies.values()) {
 			res = technologies.find((t) => t.name === title);
-			console.log(res);
 			if (res) break;
 		}
 
