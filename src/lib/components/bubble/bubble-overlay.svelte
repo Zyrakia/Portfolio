@@ -27,10 +27,12 @@
 			<h1>{title}</h1>
 		</div>
 
-		<slot />
+		<div class="content">
+			<slot />
+		</div>
 
 		<div class="links">
-			<button class="btn close" on:click={close}><MdiClose /></button>
+			<button class="btn" on:click={close}><MdiClose /></button>
 
 			<div style="min-height: 100%; border: 1px solid darkgreen;"></div>
 
@@ -99,10 +101,6 @@
 		--gradient-color: darkgreen;
 	}
 
-	.close {
-		--gradient-color: darkred;
-	}
-
 	.btn::before {
 		content: '';
 
@@ -119,6 +117,7 @@
 	}
 
 	.btn:hover::before {
+		--gradient-color: darkred;
 		left: 100%;
 	}
 
@@ -126,7 +125,15 @@
 		left: 0;
 	}
 
+	.btn:hover {
+		border-color: darkred;
+	}
+
 	.btn:active {
 		transform: scale(0.95);
+	}
+
+	.content {
+		padding: 0 0.5rem;
 	}
 </style>

@@ -1,7 +1,10 @@
 <script lang="ts">
+	import BubbleOverlay from '$lib/components/bubble/bubble-overlay.svelte';
 	import type BubbleGroup from '$lib/components/konva/bubble/bubble-group.svelte';
 	import type client_BubbleMap from '$lib/components/konva/bubble/bubble-map.svelte';
 	import type Bubble from '$lib/components/konva/bubble/bubble.svelte';
+	import TermLinkText from '$lib/components/term-link-text.svelte';
+	import TermText from '$lib/components/term-text.svelte';
 	import { suggestedBubbleRadius } from '$lib/stores/suggested-bubble-radius.js';
 	import { onMount, type ComponentProps } from 'svelte';
 
@@ -43,22 +46,77 @@
 		} satisfies BubbleGroupProps;
 	};
 
+	const getTechnologyLinks = (technology: Technology) => {
+		const links = [];
+
+		if (technology.url) links.push({ text: 'Website', url: technology.url });
+		links.push({ text: 'Related Projects', url: `/projects?using_technology=${technology.id}` });
+
+		return links;
+	};
+
 	const resize = () => {
 		width = window.innerWidth;
 		height = window.innerHeight;
 	};
 
-	const techCategories: BubbleGroupProps[] = [];
-	for (const [category, technologies] of data.technologies.entries())
-		techCategories.push(createBubbleGroup(category, technologies));
+	let techCategories: BubbleGroupProps[] = [];
+	$: {
+		const categories = [];
+
+		for (const [category, technologies] of data.technologies.entries())
+			categories.push(createBubbleGroup(category, technologies));
+
+		techCategories = categories;
+	}
+
+	let expandedTechnology: Technology | undefined;
 
 	onMount(resize);
 </script>
 
+{#if expandedTechnology}
+	<BubbleOverlay
+		on:close={() => (expandedTechnology = undefined)}
+		title={expandedTechnology.name}
+		iconUrl={expandedTechnology.logo_url ?? undefined}
+		links={getTechnologyLinks(expandedTechnology)}
+	/>
+{/if}
+
 <svelte:window on:resize={resize} />
 <svelte:component
 	this={BubbleMap}
+	on:click={(e) => {
+		const title = e.detail.title;
+
+		let res;
+		for (const technologies of data.technologies.values()) {
+			res = technologies.find((t) => t.name === title);
+			console.log(res);
+			if (res) break;
+		}
+
+		expandedTechnology = res;
+	}}
 	{width}
 	{height}
 	items={techCategories.map((v) => ({ ...v, radius: $suggestedBubbleRadius }))}
 />
+
+{#if data.referencedProject}
+	<div class="context-info">
+		<TermText text={`Displaying technologies used by ${data.referencedProject.name}`} />
+		<TermLinkText text="Click here to view all technologies" url="/tech" />
+	</div>
+{/if}
+
+<style>
+	.context-info {
+		position: absolute;
+		top: 0;
+		left: 0;
+
+		padding: 1rem;
+	}
+</style>
