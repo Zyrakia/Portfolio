@@ -5,6 +5,7 @@
 	import BubbleGroup from './bubble-group.svelte';
 	import Bubble from './bubble.svelte';
 	import { activeBubbleTitle } from '$lib/stores/active-bubble';
+	import BubbleConnectionLine from './bubble-connection-line.svelte';
 
 	type BubbleProps = Omit<ComponentProps<Bubble>, 'x' | 'y'>;
 	type GroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y'>;
@@ -167,13 +168,10 @@
 	<Layer config={{ listening: false }}>
 		{#each itemPositions as { x, y }, i}
 			{#if i < itemPositions.length - 1}
-				<Line
-					config={{
+				<BubbleConnectionLine
+					line={{
 						points: [x, y, itemPositions[i + 1].x, itemPositions[i + 1].y],
-						stroke: 'rgba(0, 100, 0, 0.3)',
-						strokeWidth: 2,
 						dash: [10, 10],
-						listening: false,
 					}}
 				/>
 			{/if}
