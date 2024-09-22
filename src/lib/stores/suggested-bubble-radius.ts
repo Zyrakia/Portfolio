@@ -11,9 +11,8 @@ export const suggestedBubbleRadius = readable(50, (set) => {
 		const width = window.innerWidth;
 		const height = window.innerHeight;
 
-		const preferred = (width / height) * 65;
-		const max = 250;
-		set(Math.min(preferred, max));
+		const radius = Math.min(width, height) / 13;
+		set(radius);
 	};
 
 	window.addEventListener('resize', dynamicallySize);
