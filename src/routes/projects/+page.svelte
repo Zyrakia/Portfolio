@@ -112,12 +112,14 @@
 	items={data.projects.map((v) => ({ ...createProjectBubble(v), radius: $suggestedBubbleRadius }))}
 />
 
-{#if data.referencedTechnology}
-	<div class="context-info">
+<div class="context-info">
+	{#if data.referencedTechnology}
 		<TermText text={`Displaying projects that use  ${data.referencedTechnology.name}`} />
 		<TermLinkText text="Click here to view all projects" url="/projects" />
-	</div>
-{/if}
+	{:else}
+		<TermLinkText text="Click to return home" url="/" />
+	{/if}
+</div>
 
 <style>
 	.context-info {
