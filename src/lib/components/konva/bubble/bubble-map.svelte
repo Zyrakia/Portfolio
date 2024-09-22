@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Konva from 'konva';
-	import { onMount, tick, type ComponentProps } from 'svelte';
+	import { createEventDispatcher, onMount, tick, type ComponentProps } from 'svelte';
 	import { Stage, Layer, Line } from 'svelte-konva';
 	import BubbleGroup from './bubble-group.svelte';
 	import Bubble from './bubble.svelte';
@@ -13,6 +13,8 @@
 
 	const isBubble = (v: (typeof items)[number]): v is BubbleProps => v.hasOwnProperty('title');
 	const isGroup = (v: (typeof items)[number]): v is GroupProps => !v.hasOwnProperty('title');
+
+	const emit = createEventDispatcher();
 
 	let stageRef: Konva.Stage | undefined;
 
@@ -96,7 +98,7 @@
 
 		hasMovedSinceLastAutoTarget = false;
 		stageRef.to({
-			duration: 0.25,
+			duration: 0.35,
 			...offsetStagePanCoords(-targetPos.x, -targetPos.y),
 		});
 	};
@@ -139,6 +141,8 @@
 		autoGotoItem(e.deltaY < 0 ? -1 : 1);
 	};
 
+	const handleClick = (clickedBubble: BubbleProps) => emit('click', clickedBubble);
+
 	$: itemNavigationTarget !== undefined && gotoItem(itemNavigationTarget);
 
 	onMount(async () => {
@@ -179,9 +183,19 @@
 	<Layer>
 		{#each items as item, i}
 			{#if isGroup(item)}
-				<BubbleGroup {...item} x={itemPositions[i].x} y={itemPositions[i].y} />
+				<BubbleGroup
+					on:click={(v) => handleClick(v.detail)}
+					{...item}
+					x={itemPositions[i].x}
+					y={itemPositions[i].y}
+				/>
 			{:else}
-				<Bubble {...item} x={itemPositions[i].x} y={itemPositions[i].y} />
+				<Bubble
+					on:click={(v) => handleClick(item)}
+					{...item}
+					x={itemPositions[i].x}
+					y={itemPositions[i].y}
+				/>
 			{/if}
 		{/each}
 	</Layer>

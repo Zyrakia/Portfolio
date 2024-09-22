@@ -44,7 +44,7 @@
 		ctx.arc(0, 0, imageSize * 0.7, 0, Math.PI * 2, false);
 	};
 
-	const redirect = () => link && window.location.assign(link);
+	const handleClick = () => emit('click');
 	const handleToggle = (toggle: boolean) => {
 		if (toggle) $activeBubbleTitle = title;
 		else if (active) $activeBubbleTitle = undefined;
@@ -71,9 +71,9 @@
 		config={{ radius }}
 		on:mouseenter={() => handleToggle(true)}
 		on:mouseleave={() => handleToggle(false)}
-		on:click={redirect}
+		on:click={handleClick}
 		on:tap={() => {
-			if (active) redirect();
+			if (active) handleClick();
 			handleToggle(!active);
 		}}
 	/>

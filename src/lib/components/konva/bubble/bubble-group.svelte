@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ComponentProps } from 'svelte';
+	import { createEventDispatcher, type ComponentProps } from 'svelte';
 	import Bubble from './bubble.svelte';
 	import { Group, Text } from 'svelte-konva';
 	import AutoSizedBackground from '../auto-sized-background.svelte';
@@ -7,6 +7,8 @@
 	export let radius: number;
 	export let x: number;
 	export let y: number;
+
+	const emit = createEventDispatcher();
 
 	let activeBubble: number | undefined = undefined;
 
@@ -67,6 +69,7 @@
 		<Bubble
 			{...bubble}
 			opacity={activeBubble === undefined || activeBubble === i ? 1 : 0.1}
+			on:click={() => emit('click', bubbles[i])}
 			on:toggle={({ detail: active }) => {
 				if (active) activeBubble = i;
 				else if (activeBubble === i) activeBubble = undefined;
