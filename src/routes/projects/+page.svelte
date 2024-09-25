@@ -21,26 +21,22 @@
 	let height = 0;
 
 	const dateFormatter = new Intl.DateTimeFormat(browser ? navigator.language : 'en-US', {
-		dateStyle: 'medium',
+		month: 'short',
+		year: 'numeric',
 	});
 
 	const getProjectTimeline = (rawStartDate?: string, rawEndDate?: string) => {
-		if (!rawStartDate) {
-			if (!rawEndDate) return '( In ongoing development )';
-			else {
-				const endDate = new Date(rawEndDate);
-				return `( Finished on ${dateFormatter.format(endDate)} )`;
-			}
-		}
+		if (!rawStartDate && !rawEndDate) return 'In continual development`';
 
-		if (!rawEndDate) {
-			const startDate = new Date(rawStartDate);
-			return `( ${dateFormatter.format(startDate)} - Present )`;
-		}
+		let startDate;
+		let endDate;
+		if (rawStartDate) startDate = new Date(rawStartDate);
+		if (rawEndDate) endDate = new Date(rawEndDate);
 
-		const startDate = new Date(rawStartDate);
-		const endDate = new Date(rawEndDate);
-		return `( ${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)} )`;
+		const startLabel = startDate ? dateFormatter.format(startDate) : 'Unknown';
+		const endLabel = endDate ? dateFormatter.format(endDate) : 'Present';
+
+		return `${startLabel} - ${endLabel}`;
 	};
 
 	const createProjectBubble = (value: Project): Omit<ComponentProps<Bubble>, 'x' | 'y' | 'radius'> => {
@@ -52,7 +48,12 @@
 			value.start_date ?? undefined,
 			value.end_date ?? undefined,
 		);
-		lines.push(formattedTimeline);
+
+		lines.push(`Timeline: ${formattedTimeline}`);
+		if ('technologies_referenced' in value)
+			lines.push(`Technologies used: ${value.technologies_referenced}`);
+		lines.push('');
+		lines.push('❗ Click to view more details');
 
 		return {
 			title: value.name,
