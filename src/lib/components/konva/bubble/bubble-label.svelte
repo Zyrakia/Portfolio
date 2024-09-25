@@ -68,7 +68,7 @@
 						text: descriptionLine,
 						fill: 'white',
 						fontSize: fontSize * 0.75,
-						y: (i + 1) * fontSize + lineHeight,
+						y: (i + 1) * fontSize + lineHeight + (i === 0 ? lineHeight / 2 : 0),
 						listening: false,
 						perfectDrawEnabled: false,
 					}}

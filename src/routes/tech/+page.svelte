@@ -25,8 +25,23 @@
 	const createBubble = (value: Technology) => {
 		const desc = [];
 
+		if ('projects_referenced' in value)
+			desc.push(
+				`Used in: ${value.projects_referenced} project${value.projects_referenced === 1 ? '' : 's'}`,
+			);
+
 		const skillLevel = value.skill_level;
-		if (skillLevel) desc.push(`⭐`.repeat(skillLevel).padEnd(5, '❌'));
+		let skillLevelText = '';
+		if (skillLevel) {
+			if (skillLevel >= 5) skillLevelText = 'Expert';
+			else if (skillLevel >= 4) skillLevelText = 'Advanced';
+			else if (skillLevel >= 2) skillLevelText = 'Intermediate';
+			else if (skillLevel >= 1) skillLevelText = 'Beginner';
+		}
+		if (skillLevelText) desc.push(`Experience level: ${skillLevelText}`);
+
+		if (desc.length !== 0) desc.push('');
+		desc.push('❗ Click to view more details');
 
 		return {
 			title: value.name,

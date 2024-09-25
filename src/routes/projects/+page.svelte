@@ -26,7 +26,7 @@
 	});
 
 	const getProjectTimeline = (rawStartDate?: string, rawEndDate?: string) => {
-		if (!rawStartDate && !rawEndDate) return 'In continual development`';
+		if (!rawStartDate && !rawEndDate) return 'In continual development';
 
 		let startDate;
 		let endDate;
@@ -51,7 +51,7 @@
 
 		lines.push(`Timeline: ${formattedTimeline}`);
 		if ('technologies_referenced' in value)
-			lines.push(`Technologies used: ${value.technologies_referenced}`);
+			lines.push(`Using: ${value.technologies_referenced} technologies`);
 		lines.push('');
 		lines.push('❗ Click to view more details');
 
