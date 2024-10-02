@@ -177,6 +177,18 @@
 		height: height,
 		draggable: true,
 	}}
+	on:mouseup={(e) => {
+		// Immitate the back button since Konva swallows the mouse event
+
+		const mouseButton = e.detail.evt.button;
+		if (mouseButton === 3) {
+			e.stopPropagation();
+			history.back();
+		} else if (mouseButton === 4) {
+			e.stopPropagation();
+			history.forward();
+		}
+	}}
 	on:dragmove={() => {
 		hasDragged = true;
 		stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())));
@@ -207,7 +219,7 @@
 				/>
 			{:else}
 				<Bubble
-					on:click={(v) => handleBubbleClick(item)}
+					on:click={() => handleBubbleClick(item)}
 					{...item}
 					x={itemPositions[i].x}
 					y={itemPositions[i].y}
