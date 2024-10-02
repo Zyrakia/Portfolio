@@ -163,7 +163,8 @@
 	onMount(async () => {
 		await tick();
 		setTimeout(() => {
-			if (!hasDragged) itemNavigationTarget = 0;
+			if ($activeBubbleTitle === undefined && itemNavigationTarget === undefined && !hasDragged)
+				itemNavigationTarget = 0;
 		}, 1000);
 	});
 </script>
