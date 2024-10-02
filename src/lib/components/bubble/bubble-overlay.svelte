@@ -6,7 +6,7 @@
 
 	export let title: string;
 	export let iconUrl: string | undefined = undefined;
-	export let links: { text: string; url: string }[] = [];
+	export let links: { text: string; url: string; external: boolean }[] = [];
 
 	let visible = true;
 	const close = () => (visible = false);
@@ -37,7 +37,12 @@
 			<div style="min-height: 100%; border: 1px solid darkgreen;"></div>
 
 			{#each links as link}
-				<a class="btn" href={link.url}>{link.text}</a>
+				<a
+					class="btn"
+					href={link.url}
+					target={link.external ? '_blank' : '_self'}
+					rel={link.external ? 'noopener' : ''}>{link.text}</a
+				>
 			{/each}
 		</div>
 	</div>

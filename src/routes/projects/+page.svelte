@@ -71,8 +71,12 @@
 	const getProjectLinks = (project: Project) => {
 		const links = [];
 
-		if (project.url) links.push({ text: 'Website', url: project.url });
-		links.push({ text: 'Used Technologies', url: `/tech?used_by_project=${project.id}` });
+		if (project.url) links.push({ text: 'Website', url: project.url, external: true });
+		links.push({
+			text: 'Used Technologies',
+			url: `/tech?used_by_project=${project.id}`,
+			external: false,
+		});
 
 		return links;
 	};

@@ -64,8 +64,12 @@
 	const getTechnologyLinks = (technology: Technology) => {
 		const links = [];
 
-		if (technology.url) links.push({ text: 'Website', url: technology.url });
-		links.push({ text: 'Related Projects', url: `/projects?using_technology=${technology.id}` });
+		if (technology.url) links.push({ text: 'Website', url: technology.url, external: true });
+		links.push({
+			text: 'Related Projects',
+			url: `/projects?using_technology=${technology.id}`,
+			external: false,
+		});
 
 		return links;
 	};
