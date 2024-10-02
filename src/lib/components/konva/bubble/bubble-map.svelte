@@ -6,11 +6,16 @@
 	import Bubble from './bubble.svelte';
 	import { activeBubbleTitle } from '$lib/stores/active-bubble';
 	import BubbleConnectionLine from './bubble-connection-line.svelte';
+	import { throttled } from '$lib/util/throttled';
 
 	type BubbleProps = Omit<ComponentProps<Bubble>, 'x' | 'y'>;
 	type GroupProps = Omit<ComponentProps<BubbleGroup>, 'x' | 'y'>;
 	type Item = BubbleProps | GroupProps;
 	type Position = { x: number; y: number };
+	type NavigateDirection = 1 | -1;
+
+	const NAV_DOWN: NavigateDirection = 1;
+	const NAV_UP: NavigateDirection = -1;
 
 	const isBubble = (v: (typeof items)[number]): v is BubbleProps => v.hasOwnProperty('title');
 	const isGroup = (v: (typeof items)[number]): v is GroupProps => !v.hasOwnProperty('title');
@@ -81,8 +86,7 @@
 		if (target !== undefined) gotoItem(target);
 	}
 
-	let itemNavigationTarget: number | undefined = undefined;
-	let hasMovedSinceLastAutoTarget = false;
+	let hasDragged = false;
 	const gotoItem = (index: number | undefined) => {
 		if (!stageRef) return;
 
@@ -97,23 +101,23 @@
 
 		const targetPos = itemPositions[index];
 
-		hasMovedSinceLastAutoTarget = false;
+		hasDragged = false;
 		stageRef.to({
 			duration: 0.35,
 			...offsetStagePanCoords(-targetPos.x, -targetPos.y),
 		});
 	};
 
+	let itemNavigationTarget: number | undefined = undefined;
 	$: gotoItem(itemNavigationTarget);
 
-	const targetNextItem = (direction: 1 | -1) => {
+	const targetNextItem = (direction: NavigateDirection) => {
 		let newTarget = (itemNavigationTarget ?? 0) + direction;
 		newTarget = Math.max(0, Math.min(newTarget, items.length - 1));
 		itemNavigationTarget = newTarget;
 	};
 
-	const autoGotoItem = (direction: 1 | -1) => {
-		if (!hasMovedSinceLastAutoTarget) return targetNextItem(direction);
+	const targetClosestItem = () => {
 		if (!stageRef) return;
 
 		const stageCenter = {
@@ -136,21 +140,35 @@
 		itemNavigationTarget = closestIndex;
 	};
 
-	const handleWheel = (e: WheelEvent) => {
-		if (!stageRef) return;
-		if (stageRef.isDragging()) return;
-		autoGotoItem(e.deltaY < 0 ? -1 : 1);
+	const autoNavigateInDirection = (direction: NavigateDirection) => {
+		if (!hasDragged) targetNextItem(direction);
+		else targetClosestItem();
 	};
 
-	const handleClick = (clickedBubble: BubbleProps) => emit('click', clickedBubble);
+	const handleWheel = throttled(250, (e: WheelEvent) => {
+		if (!stageRef) return;
+		if (stageRef.isDragging()) return;
+		autoNavigateInDirection(e.deltaY < 0 ? NAV_UP : NAV_DOWN);
+	});
+
+	const handleKeyPress = (e: KeyboardEvent) => {
+		if (e.key === 'ArrowUp') autoNavigateInDirection(NAV_UP);
+		else if (e.key === 'ArrowDown') autoNavigateInDirection(NAV_DOWN);
+	};
+
+	const handleBubbleClick = (clickedBubble: BubbleProps) => emit('click', clickedBubble);
 
 	$: itemNavigationTarget !== undefined && gotoItem(itemNavigationTarget);
 
 	onMount(async () => {
 		await tick();
-		itemNavigationTarget = 0;
+		setTimeout(() => {
+			if (!hasDragged) itemNavigationTarget = 0;
+		}, 1000);
 	});
 </script>
+
+<svelte:window on:keyup={handleKeyPress} />
 
 <Stage
 	bind:handle={stageRef}
@@ -160,7 +178,7 @@
 		draggable: true,
 	}}
 	on:dragmove={() => {
-		hasMovedSinceLastAutoTarget = true;
+		hasDragged = true;
 		stageRef?.x(Math.min(maxExtraDragX, Math.max(-maxExtraDragX, stageRef.x())));
 	}}
 	on:wheel={(e) => handleWheel(e.detail.evt)}
@@ -182,14 +200,14 @@
 		{#each items as item, i}
 			{#if isGroup(item)}
 				<BubbleGroup
-					on:click={(v) => handleClick(v.detail)}
+					on:click={(v) => handleBubbleClick(v.detail)}
 					{...item}
 					x={itemPositions[i].x}
 					y={itemPositions[i].y}
 				/>
 			{:else}
 				<Bubble
-					on:click={(v) => handleClick(item)}
+					on:click={(v) => handleBubbleClick(item)}
 					{...item}
 					x={itemPositions[i].x}
 					y={itemPositions[i].y}
